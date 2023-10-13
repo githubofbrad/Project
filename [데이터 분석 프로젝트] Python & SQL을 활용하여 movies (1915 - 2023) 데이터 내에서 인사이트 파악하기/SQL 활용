@@ -1,0 +1,21 @@
+--수익성이 가장 좋았던 상위 3개 항목 구하기
+SELECT "Movie Name", sum(Gross)
+FROM movie_data
+group by 1
+order by 2 Desc
+limit 3
+
+
+--2010년대 이후 연도별로 평점이 가장 높았던 영화 구하기
+with year_max as (
+				    SELECT "Year of Release", max("Movie Rating") as 최고평점
+				      from movie_data
+				      where "Year of Release" >= 2010
+				  group by 1
+				  order by 1 
+                   )
+
+SELECT A.*,B."Movie Name"
+  from year_max A
+  join movie_data B on A."Year of Release"  = B."Year of Release"
+  order by A."Year of Release"
