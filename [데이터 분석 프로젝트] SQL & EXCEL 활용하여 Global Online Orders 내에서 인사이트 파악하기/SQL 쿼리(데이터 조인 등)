@@ -1,0 +1,59 @@
+--데이터 조인하기
+SELECT *
+FROM global_orderdetails A
+join global_products B on A.ProductID = B.ProductID 
+
+
+
+--글로벌적으로 가장 많이 팔린 상품 상위 다섯 품목 구하기
+SELECT B.ProductName, sum(A.Quantity) AS 수량합계
+FROM global_orderdetails A
+join global_products B on A.ProductID = B.ProductID 
+group by 1 
+ORDER BY 2 DESC
+LIMIT 5
+
+
+
+--상품 평균 가격 구하기
+SELECT AVG(B.Price) AS 상품_평균가격
+FROM global_orderdetails A
+join global_products B on A.ProductID = B.ProductID 
+
+
+
+--상품 무게 가격 분포 확인하기(쿼리 출력 후 엑셀에서 그래프로 나타내기)
+SELECT B.Unit , COUNT(B.ProductName) as 갯수
+FROM global_orderdetails A
+join global_products B on A.ProductID = B.ProductID
+GROUP BY 1
+
+
+
+--ORDER ID별 상품 구입 수량 등급 매기기
+--Step1)
+SELECT A.OrderID AS ID ,
+	  CASE WHEN sum(Quantity) > 50 THEN 'A'
+	  WHEN sum(Quantity) > 30 THEN 'B'
+	  WHEN sum(Quantity) > 10 THEN 'C'
+	  ELSE 'D' END AS 등급
+  FROM global_orderdetails A
+  join global_products B on A.ProductID = B.ProductID
+  group by 1
+
+
+
+--Step2)
+WITH grade as (SELECT A.OrderID AS ID ,
+				 CASE WHEN sum(Quantity) > 50 THEN 'A'
+		  		 WHEN sum(Quantity) > 30 THEN 'B'
+		  		 WHEN sum(Quantity) > 10 THEN 'C'
+		  		 ELSE 'D' END AS 등급
+			  FROM global_orderdetails A
+		    	  join global_products B on A.ProductID = B.ProductID
+		    	  group by 1
+               )
+               
+ SELECT 등급, count(등급) as 갯수
+   from grade 
+   GROUP BY 1
