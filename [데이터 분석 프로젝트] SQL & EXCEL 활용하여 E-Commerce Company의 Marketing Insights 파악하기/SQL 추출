@@ -1,0 +1,59 @@
+--데이터 불러오기
+SELECT *   
+  FROM Online_Sales 
+  
+select *
+  from Marketing_Spend 
+  
+select *
+  from CustomersData 
+  
+  
+  
+--online_sales 내에서 Category별 쿠폰 사용 갯수 카운트하기
+SELECT Product_Category
+  FROM Online_Sales 
+  group by 1
+  
+ 
+SELECT Product_Category, count(Coupon_Status) as 쿠폰카운트
+  FROM Online_Sales 
+  where Coupon_Status = 'Used'
+  GROUP BY 1
+  ORDER BY 2 DESC
+  LIMIT 5
+
+  
+  
+ --marketing_spend 내에서 오프라인 및 온라인 비용 지출 비울 구하기
+ with off_online as (SELECT SUM(Offline_Spend) as offlinesum
+ 				                  , (SUM(Online_Spend)) as onlinesum 
+   			              ㅍFROM Marketing_Spend
+   			            )
+   			     
+ SELECT  round(offlinesum /(offlinesum + onlinesum ),2) * 100 as 오프라인비율,
+ 	       round(onlinesum / (offlinesum + onlinesum ),2) * 100 as 온라인비율
+   FROM off_online
+   
+   
+   
+ --online_sales와 customerdata 조인하여 성별 기준 쿠폰 사용 갯수 비교하기
+ ---1.조인하기
+SELECT *
+  FROM Online_Sales A
+  JOIN CustomersData B ON A.CustomerID  = B.CustomerID 
+
+  
+ ---2.성별 기준 그룹화
+SELECT B.Gender 
+  FROM Online_Sales A
+  JOIN CustomersData B ON A.CustomerID  = B.CustomerID 
+  GROUP BY B.Gender 
+
+  
+---3. 성별 기준 쿠폰 사용 갯수 카운트
+SELECT B.Gender, COUNT(A.Coupon_Status) as 쿠폰카운트
+  FROM Online_Sales A
+  JOIN CustomersData B ON A.CustomerID  = B.CustomerID
+  WHERE A.Coupon_Status = 'Used'
+  GROUP BY B.Gender 
